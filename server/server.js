@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
@@ -7,11 +8,9 @@ const adminProductsRouter = require("./routes/admin/products-routes");
 const shopProductsRouter = require("./routes/shop/products-routes");
 
 // creating a database connection
-
+const MONGO_URI = process.env.MONGO_URI;
 mongoose
-  .connect(
-    "REMOVED/"
-  )
+  .connect(MONGO_URI)
   .then(() => console.log("DB Connected"))
   .catch((error) => console.log(error));
 
