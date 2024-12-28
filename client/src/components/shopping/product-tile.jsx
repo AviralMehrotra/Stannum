@@ -3,7 +3,11 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
 
-function ShoppingProductTile({ product, handleGetProductDetails }) {
+function ShoppingProductTile({
+  product,
+  handleGetProductDetails,
+  handleAddToCart,
+}) {
   return (
     <Card className="w-full max-w-sm mx-auto">
       <div onClick={() => handleGetProductDetails(product?._id)}>
@@ -32,7 +36,7 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
           <div className="flex justify-between items-center mb-2">
             <span
               className={`${
-                product?.salePrice > 0 ? "line-through" : ""
+                product?.salePrice > 0 ? "line-through decoration-2" : ""
               }text-lg font-semibold text-primary`}
             >
               ₹{product?.price}
@@ -40,14 +44,26 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
             {product?.salePrice > 0 ? (
               <span className="text-lg font-semibold text-primary">
                 ₹{product?.salePrice}
+                <sup className="text-red-500 ml-1">
+                  {Math.round(
+                    ((product?.price - product?.salePrice) / product?.price) *
+                      100
+                  )}
+                  %
+                </sup>
               </span>
             ) : null}
           </div>
         </CardContent>
-        <CardFooter>
-          <Button className="w-full">Add to Cart</Button>
-        </CardFooter>
       </div>
+      <CardFooter>
+        <Button
+          onClick={() => handleAddToCart(product?._id)}
+          className="w-full"
+        >
+          Add to Cart
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

@@ -1,15 +1,43 @@
 import { StarIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent } from "../ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { Separator } from "../ui/separator";
 import { Input } from "../ui/input";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
+import { useToast } from "@/hooks/use-toast";
+import { setProductDetails } from "@/store/shop/products-slice";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const { toast } = useToast();
+
+  function handleAddToCart(getCurrentProductId) {
+    dispatch(
+      addToCart({
+        userId: user?.id,
+        productId: getCurrentProductId,
+        quantity: 1,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchCartItems(user?.id));
+        toast({
+          title: "Product added to cart",
+        });
+      }
+    });
+  }
+  function handleDialogClose() {
+    setOpen(false);
+    dispatch(setProductDetails());
+  }
   return (
     <div>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="grid grid-cols-2 gap-8 sm:p-12 max-w-[90vw] sm:max-w-[80vw] lg:max-w-[70vw]">
+      <Dialog open={open} onOpenChange={handleDialogClose}>
+        <DialogContent className="grid grid-cols-2 gap-8 sm:p-12 max-w-[90vw] max-h-[95vh] sm:max-w-[80vw] sm:max-h-[70vw] lg:max-w-[70vw] lg:max-h-[95vh] overflow-auto">
           <div className="relative overflow-hidden rounded-lg">
             <img
               src={productDetails?.image}
@@ -20,8 +48,11 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             />
           </div>
           <div className="">
-            <h1 className="text-3xl font-extrabold">{productDetails?.title}</h1>
-            <p className="text-muted-foreground text-l mb-5 mt-4">
+            <DialogTitle className="text-3xl font-extrabold">
+              {productDetails?.title}
+            </DialogTitle>
+            {/* <h1 className="text-3xl font-extrabold">{productDetails?.title}</h1> */}
+            <p className="text-muted-foreground text-l mb-5 mt-4 overflow-auto">
               {productDetails?.description}
             </p>
             <div className="flex items-center justify-between">
@@ -49,7 +80,12 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               <span className="text-muted-foreground">(4.5)</span>
             </div>
             <div className="mt-5 mb-5">
-              <Button className="w-full">Add to Cart</Button>
+              <Button
+                className="w-full"
+                onClick={() => handleAddToCart(productDetails?._id)}
+              >
+                Add to Cart
+              </Button>
             </div>
             <Separator />
             <div className="max-h-[300px] overflow-auto">
