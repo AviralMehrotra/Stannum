@@ -70,9 +70,9 @@ function App() {
             </CheckAuth>
           }
         >
+          <Route path="home" element={<ShoppingHome />} />
           <Route path="account" element={<ShoppingAccounts />} />
           <Route path="checkout" element={<ShoppingCheckout />} />
-          <Route path="home" element={<ShoppingHome />} />
           <Route path="listing" element={<ShoppingListing />} />
         </Route>
         <Route path="*" element={<NotFound />} />

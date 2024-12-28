@@ -97,7 +97,7 @@ function HeaderRightContent() {
   );
 }
 
-function ShooppingHeader() {
+function ShoppingHeader() {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   return (
@@ -130,4 +130,4 @@ function ShooppingHeader() {
   );
 }
 
-export default ShooppingHeader;
+export default ShoppingHeader;

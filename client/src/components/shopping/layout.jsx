@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
-import ShooppingHeader from "./header";
+import ShoppingHeader from "./header";
 
 function ShoppingLayout() {
   return (
     <div className="flex flex-col overflow-hidden">
       {/* Common Header */}
-      <ShooppingHeader />
+      <ShoppingHeader />
       <main className="flex flex-col w-full">
         <Outlet />
       </main>
