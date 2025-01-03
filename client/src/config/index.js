@@ -1,3 +1,5 @@
+import { Search } from "lucide-react";
+
 export const registerFormControls = [
   {
     name: "userName",
@@ -130,6 +132,11 @@ export const shoppingViewHeaderMenuItems = [
     id: "securitySystem",
     label: "Security",
     path: "/shop/listing",
+  },
+  {
+    id: "search",
+    label: "Search",
+    path: "/shop/search",
   },
 ];
 

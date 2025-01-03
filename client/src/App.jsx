@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import AuthLayout from "./components/auth/layout";
 import AuthLogin from "./pages/auth/login";
 import AuthRegister from "./pages/auth/register";
@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth } from "./store/auth-slice";
 import { Skeleton } from "./components/ui/skeleton";
+import SearchProducts from "./pages/shopping/search";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -25,7 +26,8 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(checkAuth());
+    const token = JSON.parse(sessionStorage.getItem("token"));
+    dispatch(checkAuth(token));
   }, [dispatch]);
 
   if (isLoading) {
@@ -74,7 +76,9 @@ function App() {
           <Route path="account" element={<ShoppingAccounts />} />
           <Route path="checkout" element={<ShoppingCheckout />} />
           <Route path="listing" element={<ShoppingListing />} />
+          <Route path="search" element={<SearchProducts />} />
         </Route>
+        <Route path="/" element={<Navigate to="/auth/login" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

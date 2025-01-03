@@ -58,7 +58,7 @@ function ShoppingProductTile({
       </div>
       <CardFooter>
         <Button
-          onClick={() => handleAddToCart(product?._id)}
+          onClick={() => handleAddToCart(product?._id, product?.totalStock)}
           className="w-full"
         >
           Add to Cart
