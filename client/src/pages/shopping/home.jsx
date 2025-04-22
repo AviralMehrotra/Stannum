@@ -2,18 +2,26 @@ import { Button } from "@/components/ui/button";
 import bannerOne from "../../assets/banner-1.jpg";
 import bannerTwo from "../../assets/banner-2.jpg";
 import bannerThree from "../../assets/banner-3.jpg";
+import apple from "../../assets/icons/apple.png";
+import bose from "../../assets/icons/bose.png";
+import dell from "../../assets/icons/dell.png";
+import hp from "../../assets/icons/hp.png";
+import jbl from "../../assets/icons/jbl.png";
+import lenovo from "../../assets/icons/lenovo.png";
+import oneplus from "../../assets/icons/oneplus.png";
+import samsung from "../../assets/icons/samsung.png";
+import sony from "../../assets/icons/sony.png";
+import xiaomi from "../../assets/icons/xiaomi.png";
 import {
-  BatteryCharging,
-  Cctv,
+  Smartphone,
+  Laptop,
+  Headphones,
+  Tablet,
+  Gamepad2,
+  Speaker,
+  Watch,
   ChevronLeftIcon,
   ChevronRightIcon,
-  CookingPot,
-  Fan,
-  GlassWater,
-  Lightbulb,
-  Power,
-  Snowflake,
-  Sun,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -29,20 +37,27 @@ import { useToast } from "@/hooks/use-toast";
 import ProductDetailsDialog from "@/components/shopping/product-details";
 
 const categoriesWithIcon = [
-  { id: "kitchenAppl", label: "Kitchen Appliances", icon: CookingPot },
-  { id: "battery", label: "Battery and Inverters", icon: Power },
-  { id: "summerProd", label: "Summer Essentials", icon: Sun },
-  { id: "winterProd", label: "Winter Essentials", icon: Snowflake },
-  { id: "securitySystem", label: "Security Systems", icon: Cctv },
+  { id: "smartphones", label: "Smartphones", icon: Smartphone },
+  { id: "laptops", label: "Laptops", icon: Laptop },
+  { id: "headphones", label: "Headphones", icon: Headphones },
+  { id: "earphones", label: "Earphones", icon: Headphones },
+  { id: "smartwatches", label: "Smartwatches", icon: Watch },
+  { id: "tablets", label: "Tablets", icon: Tablet },
+  { id: "gaming", label: "Gaming", icon: Gamepad2 },
+  { id: "audio", label: "Audio", icon: Speaker },
 ];
 
 const brandsWithIcon = [
-  { id: "bajaj", label: "Bajaj", icon: CookingPot },
-  { id: "havells", label: "Havells", icon: Fan },
-  { id: "sujata", label: "Sujata", icon: CookingPot },
-  { id: "phillips", label: "Phillips", icon: Lightbulb },
-  { id: "microtek", label: "Microtek", icon: BatteryCharging },
-  { id: "livpure", label: "Livpure", icon: GlassWater },
+  { id: "apple", label: "Apple", icon: apple, isImage: true },
+  { id: "samsung", label: "Samsung", icon: samsung, isImage: true },
+  { id: "sony", label: "Sony", icon: sony, isImage: true },
+  { id: "bose", label: "Bose", icon: bose, isImage: true },
+  { id: "dell", label: "Dell", icon: dell, isImage: true },
+  { id: "hp", label: "HP", icon: hp, isImage: true },
+  { id: "lenovo", label: "Lenovo", icon: lenovo, isImage: true },
+  { id: "xiaomi", label: "Xiaomi", icon: xiaomi, isImage: true },
+  { id: "oneplus", label: "OnePlus", icon: oneplus, isImage: true },
+  { id: "jbl", label: "JBL", icon: jbl, isImage: true },
 ];
 
 function ShoppingHome() {
@@ -180,7 +195,11 @@ function ShoppingHome() {
                 key={categoryItem.id}
               >
                 <CardContent className="flex flex-col items-center justify-center p-6">
-                  <categoryItem.icon className="w-12 h-12 mb-4 text-primary" />
+                  {categoryItem.isImage ? (
+                    <img src={categoryItem.icon} alt={categoryItem.label} className="w-12 h-12 mb-4" />
+                  ) : (
+                    <categoryItem.icon className="w-12 h-12 mb-4 text-primary" />
+                  )}
                   <span className="font-bold">{categoryItem.label}</span>
                 </CardContent>
               </Card>
@@ -200,7 +219,17 @@ function ShoppingHome() {
                 key={brandItem.id}
               >
                 <CardContent className="flex flex-col items-center justify-center p-6">
-                  <brandItem.icon className="w-12 h-12 mb-4 text-primary" />
+                  {brandItem.isImage ? (
+                    <div className="w-16 h-16 mb-4 flex items-center justify-center">
+                      <img 
+                        src={brandItem.icon} 
+                        alt={brandItem.label} 
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <brandItem.icon className="w-12 h-12 mb-4 text-primary" />
+                  )}
                   <span className="font-bold">{brandItem.label}</span>
                 </CardContent>
               </Card>
