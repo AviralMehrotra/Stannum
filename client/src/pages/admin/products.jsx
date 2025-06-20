@@ -18,6 +18,7 @@ import {
 } from "@/store/admin/products-slice";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Textarea } from "@/components/ui/textarea";
 
 const initialFormData = {
   image: null,
@@ -37,6 +38,7 @@ function AdminProducts() {
   const [imageFile, setImageFile] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const { productList } = useSelector((state) => state.adminProducts);
   const dispatch = useDispatch();
@@ -92,11 +94,62 @@ function AdminProducts() {
     });
   }
 
+  async function handleGenerateDescription() {
+    if (!formData.title) {
+      toast({
+        title: "Error",
+        description: "Please enter a product title first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/admin/description/generate-description",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ productName: formData.title }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        setFormData({
+          ...formData,
+          description: result.data,
+        });
+        toast({
+          title: "Success",
+          description: "Description generated successfully.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to generate description.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
   useEffect(() => {
     dispatch(fetchAllProducts());
   }, [dispatch]);
 
-  console.log(productList, uploadedImageUrl, "productList");
 
   return (
     <Fragment>
@@ -150,6 +203,33 @@ function AdminProducts() {
               formControls={addProductFormElements}
               buttonText={currentEditedId !== null ? "Submit" : "Add"}
               isBtnDisabled={!isFormValid()}
+              customControls={{
+                description: (control) => (
+                  <div className="relative">
+                    <Textarea
+                      name={control.name}
+                      placeholder={control.placeholder}
+                      id={control.id}
+                      value={formData.description}
+                      onChange={(event) =>
+                        setFormData({
+                          ...formData,
+                          description: event.target.value,
+                        })
+                      }
+                      rows={5}
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleGenerateDescription}
+                      className="absolute bottom-2 right-2"
+                      disabled={isGenerating}
+                    >
+                      {isGenerating ? "Generating..." : "Generate"}
+                    </Button>
+                  </div>
+                ),
+              }}
             />
           </div>
         </SheetContent>

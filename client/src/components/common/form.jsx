@@ -17,6 +17,7 @@ function CommonForm({
   onSubmit,
   buttonText,
   isBtnDisabled,
+  customControls = {},
 }) {
   function renderInputByComponentType(getControlItem) {
     let element = null;
@@ -110,7 +111,9 @@ function CommonForm({
         {formControls.map((controlItem) => (
           <div className="grid w-full gap-1.5" key={controlItem.name}>
             <Label className="mb-1">{controlItem.label}</Label>
-            {renderInputByComponentType(controlItem)}
+            {customControls[controlItem.name]
+              ? customControls[controlItem.name](controlItem)
+              : renderInputByComponentType(controlItem)}
           </div>
         ))}
       </div>
