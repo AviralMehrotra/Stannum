@@ -1,4 +1,4 @@
-# E-commerce Platform
+# Stannum - An E-commerce Platform
 
 A full-stack e-commerce application built with React, Node.js, and MongoDB. This project implements a modern e-commerce platform with user authentication, product management, shopping cart functionality, and order processing.
 
