@@ -19,6 +19,7 @@ import {
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
 
 const initialFormData = {
   image: null,
