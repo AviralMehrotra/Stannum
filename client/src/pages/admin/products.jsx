@@ -107,7 +107,9 @@ function AdminProducts() {
     setIsGenerating(true);
     try {
       const response = await fetch(
-        "http://localhost:5000/api/admin/description/generate-description",
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/admin/description/generate-description`,
         {
           method: "POST",
           headers: {
@@ -149,7 +151,6 @@ function AdminProducts() {
   useEffect(() => {
     dispatch(fetchAllProducts());
   }, [dispatch]);
-
 
   return (
     <Fragment>
