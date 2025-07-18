@@ -14,7 +14,7 @@ async function generateDescription(req, res) {
 
     const scriptPath = path.join(__dirname, '..', '..', 'services', 'scraper.py');
 
-    const pythonProcess = spawn("py", [
+    const pythonProcess = spawn("python3", [
       scriptPath,
       productName,
     ], {
