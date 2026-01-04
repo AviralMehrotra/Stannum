@@ -50,6 +50,13 @@ app.use("/api/shop/cart", shopCartRouter);
 app.use("/api/shop/address", shopAddressRouter);
 app.use("/api/shop/search", shopSearchRouter);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is healthy",
+  });
+});
+
 // Static file serving for production
 const distPath = path.join(__dirname, "../client/dist");
 const fs = require("fs");
