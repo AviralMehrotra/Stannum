@@ -51,11 +51,14 @@ app.use("/api/shop/address", shopAddressRouter);
 app.use("/api/shop/search", shopSearchRouter);
 
 // Static file serving for production
-app.use(express.static(path.join(__dirname, "../client/dist")));
+const distPath = path.join(__dirname, "../client/dist");
+const fs = require("fs");
 
-// Catch-all route for SPA
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-});
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+}
 
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
