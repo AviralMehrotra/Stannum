@@ -128,7 +128,9 @@ function ShoppingListing() {
   useEffect(() => {
     if (filters && Object.keys(filters).length > 0) {
       const createQueryString = createSearchParamsHelper(filters);
-      setSearchParams(new URLSearchParams(createQueryString));
+      setSearchParams(new URLSearchParams(createQueryString), {
+        replace: true,
+      });
     }
   }, [filters]);
 

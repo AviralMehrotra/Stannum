@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const path = require("path");
 const authRouter = require("./routes/auth/auth-routes");
 const adminProductsRouter = require("./routes/admin/products-routes");
 const adminDescriptionRouter = require("./routes/admin/description-routes");
@@ -32,6 +33,7 @@ app.use(
       "Cache-Control",
       "Expires",
       "Pragma",
+      "x-requested-with",
     ],
     credentials: true,
   })
@@ -48,4 +50,12 @@ app.use("/api/shop/cart", shopCartRouter);
 app.use("/api/shop/address", shopAddressRouter);
 app.use("/api/shop/search", shopSearchRouter);
 
-app.listen(PORT, () => console.log("Server is now running on port 5000"));
+// Static file serving for production
+app.use(express.static(path.join(__dirname, "../client/dist")));
+
+// Catch-all route for SPA
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+});
+
+app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
