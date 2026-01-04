@@ -19,7 +19,7 @@ import {
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Textarea } from "@/components/ui/textarea";
-import axios from "axios";
+import { Plus, Package, Sparkles } from "lucide-react";
 
 const initialFormData = {
   image: null,
@@ -54,12 +54,14 @@ function AdminProducts() {
             formData,
           })
         ).then((data) => {
-          console.log(data, "edit");
           if (data?.payload?.success) {
             dispatch(fetchAllProducts());
             setFormData(initialFormData);
             setOpenCreateProductsDialog(false);
             setCurrentEditedId(null);
+            toast({
+              title: "Product updated successfully",
+            });
           }
         })
       : dispatch(
@@ -68,9 +70,8 @@ function AdminProducts() {
             image: uploadedImageUrl,
           })
         ).then((data) => {
-          console.log(data);
           if (data?.payload?.success) {
-            dispatch(fetchAllProducts);
+            dispatch(fetchAllProducts());
             setOpenCreateProductsDialog(false);
             setImageFile(null);
             setFormData(initialFormData);
@@ -91,6 +92,9 @@ function AdminProducts() {
     dispatch(deleteProduct(getCurrentProductId)).then((data) => {
       if (data?.payload?.success) {
         dispatch(fetchAllProducts());
+        toast({
+          title: "Product deleted successfully",
+        });
       }
     });
   }
@@ -155,25 +159,60 @@ function AdminProducts() {
 
   return (
     <Fragment>
-      <div className="mb-5 w-full flex justify-end">
-        <Button onClick={() => setOpenCreateProductsDialog(true)}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">
+            Products Management
+          </h1>
+          <p className="text-slate-500 text-sm mt-1">
+            Add, edit or remove products from your store.
+          </p>
+        </div>
+        <Button
+          onClick={() => setOpenCreateProductsDialog(true)}
+          className="bg-[#1a4d3e] hover:bg-[#143d31] text-white rounded-2xl font-bold h-12 px-6 shadow-lg shadow-green-900/10 transition-all active:scale-95 flex items-center gap-2"
+        >
+          <Plus className="w-5 h-5" />
           Add New Product
         </Button>
       </div>
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {productList && productList.length > 0
-          ? productList.map((productItem) => (
-              <AdminProductTile
-                key={productItem._id}
-                setCurrentEditedId={setCurrentEditedId}
-                setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-                setFormData={setFormData}
-                product={productItem}
-                handleDelete={handleDelete}
-              />
-            ))
-          : null}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {productList && productList.length > 0 ? (
+          productList.map((productItem) => (
+            <AdminProductTile
+              key={productItem._id}
+              setCurrentEditedId={setCurrentEditedId}
+              setOpenCreateProductsDialog={setOpenCreateProductsDialog}
+              setFormData={setFormData}
+              product={productItem}
+              handleDelete={handleDelete}
+            />
+          ))
+        ) : (
+          <div className="col-span-full py-20 bg-white rounded-[2.5rem] border border-slate-100 flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
+              <Package className="w-10 h-10" />
+            </div>
+            <div>
+              <p className="text-slate-900 font-bold text-lg">
+                No products found
+              </p>
+              <p className="text-slate-400 text-sm">
+                Start by adding your first product to the store.
+              </p>
+            </div>
+            <Button
+              onClick={() => setOpenCreateProductsDialog(true)}
+              variant="outline"
+              className="rounded-xl font-bold border-slate-200"
+            >
+              Add Product
+            </Button>
+          </div>
+        )}
       </div>
+
       <Sheet
         open={openCreateProductsDialog}
         onOpenChange={() => {
@@ -182,57 +221,87 @@ function AdminProducts() {
           setFormData(initialFormData);
         }}
       >
-        <SheetContent side="right" className="overflow-auto">
-          <SheetHeader>
-            <SheetTitle>
-              {currentEditedId !== null ? "Edit Product" : "Add New Product"}
-            </SheetTitle>
+        <SheetContent
+          side="right"
+          className="w-full sm:max-w-xl p-0 flex flex-col h-full border-l border-slate-100"
+        >
+          <SheetHeader className="p-6 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-[#1a4d3e]">
+                <Plus className="w-5 h-5" />
+              </div>
+              <SheetTitle className="text-xl font-bold text-slate-900">
+                {currentEditedId !== null ? "Edit Product" : "Add New Product"}
+              </SheetTitle>
+            </div>
           </SheetHeader>
-          <ProductImageUpload
-            imageFile={imageFile}
-            setImageFile={setImageFile}
-            uploadedImageUrl={uploadedImageUrl}
-            setUploadedImageUrl={setUploadedImageUrl}
-            setImageLoadingState={setImageLoadingState}
-            imageLoadingState={imageLoadingState}
-            isEditMode={currentEditedId !== null}
-          />
-          <div className="py-6">
-            <CommonForm
-              onSubmit={onSubmit}
-              formData={formData}
-              setFormData={setFormData}
-              formControls={addProductFormElements}
-              buttonText={currentEditedId !== null ? "Submit" : "Add"}
-              isBtnDisabled={!isFormValid()}
-              customControls={{
-                description: (control) => (
-                  <div className="relative">
-                    <Textarea
-                      name={control.name}
-                      placeholder={control.placeholder}
-                      id={control.id}
-                      value={formData.description}
-                      onChange={(event) =>
-                        setFormData({
-                          ...formData,
-                          description: event.target.value,
-                        })
-                      }
-                      rows={5}
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleGenerateDescription}
-                      className="absolute bottom-2 right-2"
-                      disabled={isGenerating}
-                    >
-                      {isGenerating ? "Generating..." : "Generate"}
-                    </Button>
-                  </div>
-                ),
-              }}
-            />
+
+          <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            <div className="space-y-6">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Product Image
+              </h3>
+              <ProductImageUpload
+                imageFile={imageFile}
+                setImageFile={setImageFile}
+                uploadedImageUrl={uploadedImageUrl}
+                setUploadedImageUrl={setUploadedImageUrl}
+                setImageLoadingState={setImageLoadingState}
+                imageLoadingState={imageLoadingState}
+                isEditMode={currentEditedId !== null}
+              />
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Product Details
+              </h3>
+              <CommonForm
+                onSubmit={onSubmit}
+                formData={formData}
+                setFormData={setFormData}
+                formControls={addProductFormElements}
+                buttonText={
+                  currentEditedId !== null ? "Save Changes" : "Create Product"
+                }
+                isBtnDisabled={!isFormValid()}
+                className="space-y-5"
+                customControls={{
+                  description: (control) => (
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
+                          Description
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleGenerateDescription}
+                          disabled={isGenerating}
+                          className="flex items-center gap-1.5 text-[11px] font-bold text-[#1a4d3e] hover:text-[#143d31] transition-colors disabled:opacity-50"
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          {isGenerating ? "Generating..." : "AI Generate"}
+                        </button>
+                      </div>
+                      <Textarea
+                        name={control.name}
+                        placeholder={control.placeholder}
+                        id={control.id}
+                        value={formData.description}
+                        onChange={(event) =>
+                          setFormData({
+                            ...formData,
+                            description: event.target.value,
+                          })
+                        }
+                        rows={5}
+                        className="bg-slate-50 border-none rounded-2xl focus-visible:ring-2 focus-visible:ring-[#1a4d3e]/20 transition-all resize-none"
+                      />
+                    </div>
+                  ),
+                }}
+              />
+            </div>
           </div>
         </SheetContent>
       </Sheet>

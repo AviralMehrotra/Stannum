@@ -2,8 +2,15 @@ import { Navigate, useLocation } from "react-router-dom";
 
 function CheckAuth({ isAuthenticated, user, children }) {
   const location = useLocation();
+  // Allow unauthenticated users to access shopping home and listing pages
+  const publicShoppingPaths = ["/shop/home", "/shop/listing", "/shop/search"];
+  const isPublicShoppingPath = publicShoppingPaths.some((path) =>
+    location.pathname.includes(path)
+  );
+
   if (
     !isAuthenticated &&
+    !isPublicShoppingPath &&
     !(
       location.pathname.includes("/login") ||
       location.pathname.includes("/register")

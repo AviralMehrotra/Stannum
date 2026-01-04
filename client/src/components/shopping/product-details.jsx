@@ -1,4 +1,4 @@
-import { StarIcon } from "lucide-react";
+import { StarIcon, ShoppingCart, X, MessageSquare, User } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/hooks/use-toast";
 import { setProductDetails } from "@/store/shop/products-slice";
+import { Badge } from "../ui/badge";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const dispatch = useDispatch();
@@ -54,132 +55,182 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     setOpen(false);
     dispatch(setProductDetails());
   }
+
   return (
-    <div>
-      <Dialog open={open} onOpenChange={handleDialogClose}>
-        <DialogContent className="grid grid-cols-2 gap-8 sm:p-12 max-w-[90vw] max-h-[95vh] sm:max-w-[80vw] sm:max-h-[70vw] lg:max-w-[70vw] lg:max-h-[95vh] overflow-auto">
-          <div className="relative overflow-hidden rounded-lg">
-            <img
-              src={productDetails?.image}
-              alt={productDetails?.title}
-              width={600}
-              height={600}
-              className="aspect-square w-full object-cover"
-            />
+    <Dialog open={open} onOpenChange={handleDialogClose}>
+      <DialogContent className="p-0 border-none max-w-[95vw] sm:max-w-[85vw] lg:max-w-[1000px] bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 h-full max-h-[90vh]">
+          {/* Left: Image Section */}
+          <div className="relative bg-slate-50 p-8 flex items-center justify-center">
+            <div className="relative aspect-square w-full max-w-[500px] rounded-[2rem] overflow-hidden shadow-2xl shadow-green-900/10">
+              <img
+                src={productDetails?.image}
+                alt={productDetails?.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {productDetails?.salePrice > 0 && (
+              <Badge className="absolute top-12 left-12 bg-[#1a4d3e] text-white border-none px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-widest">
+                Sale
+              </Badge>
+            )}
           </div>
-          <div className="">
-            <DialogTitle className="text-3xl font-extrabold">
-              {productDetails?.title}
-            </DialogTitle>
-            {/* <h1 className="text-3xl font-extrabold">{productDetails?.title}</h1> */}
-            <p className="text-muted-foreground text-l mb-5 mt-4 overflow-auto">
-              {productDetails?.description}
-            </p>
-            <div className="flex items-center justify-between">
-              <p
-                className={` text-3xl font-bold text-primary ${
-                  productDetails?.salePrice > 0 ? "line-through" : ""
-                }`}
-              >
-                ₹{productDetails?.price}
-              </p>
-              {productDetails?.salePrice > 0 ? (
-                <p className="text-3xl font-bold text-muted-foreground">
-                  ₹{productDetails?.salePrice}
-                </p>
-              ) : null}
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-0.5">
-                <StarIcon className="w-5 h-5 fill-primary" />
-                <StarIcon className="w-5 h-5 fill-primary" />
-                <StarIcon className="w-5 h-5 fill-primary" />
-                <StarIcon className="w-5 h-5 fill-primary" />
-                <StarIcon className="w-5 h-5 fill-primary" />
+
+          {/* Right: Content Section */}
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="p-8 lg:p-12 overflow-y-auto flex-1 space-y-8">
+              {/* Header */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="outline"
+                    className="border-slate-200 text-slate-500 font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full"
+                  >
+                    {productDetails?.category}
+                  </Badge>
+                  <Badge
+                    variant="outline"
+                    className="border-slate-200 text-slate-500 font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full"
+                  >
+                    {productDetails?.brand}
+                  </Badge>
+                </div>
+                <DialogTitle className="text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
+                  {productDetails?.title}
+                </DialogTitle>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <StarIcon
+                        key={i}
+                        className={`w-4 h-4 ${
+                          i < 4
+                            ? "fill-[#1a4d3e] text-[#1a4d3e]"
+                            : "fill-slate-200 text-slate-200"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-bold text-slate-400">
+                    (4.5 Reviews)
+                  </span>
+                </div>
               </div>
-              <span className="text-muted-foreground">(4.5)</span>
+
+              {/* Price */}
+              <div className="flex items-baseline gap-4">
+                <span className="text-4xl font-bold text-slate-900">
+                  ₹
+                  {(productDetails?.salePrice > 0
+                    ? productDetails?.salePrice
+                    : productDetails?.price || 0
+                  ).toLocaleString()}
+                </span>
+                {productDetails?.salePrice > 0 && (
+                  <span className="text-xl text-slate-400 line-through font-medium">
+                    ₹{(productDetails?.price || 0).toLocaleString()}
+                  </span>
+                )}
+              </div>
+
+              {/* Description */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  Description
+                </h3>
+                <p className="text-slate-600 leading-relaxed">
+                  {productDetails?.description}
+                </p>
+              </div>
+
+              {/* Reviews Section */}
+              <div className="space-y-6 pt-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    Customer Reviews
+                  </h3>
+                  <button className="text-[11px] font-bold text-[#1a4d3e] hover:underline">
+                    View All
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {[1, 2].map((review) => (
+                    <div key={review} className="flex gap-4">
+                      <Avatar className="w-10 h-10 rounded-xl border-none bg-slate-100">
+                        <AvatarFallback className="bg-slate-100 text-[#1a4d3e] font-bold">
+                          AM
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-bold text-slate-900">
+                            Aviral Mehrotra
+                          </h4>
+                          <span className="text-[10px] font-bold text-slate-400">
+                            2 days ago
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-0.5 mb-1">
+                          {[...Array(5)].map((_, i) => (
+                            <StarIcon
+                              key={i}
+                              className="w-3 h-3 fill-[#1a4d3e] text-[#1a4d3e]"
+                            />
+                          ))}
+                        </div>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                          Absolutely love this product! The quality is top-notch
+                          and it exceeded my expectations.
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="mt-5 mb-5">
+
+            {/* Footer Actions */}
+            <div className="p-8 lg:px-12 lg:pb-12 bg-white border-t border-slate-50 space-y-4">
+              <div className="flex gap-3">
+                <div className="flex-1 relative">
+                  <Input
+                    placeholder="Write a review..."
+                    className="h-14 pl-5 pr-12 bg-slate-50 border-none rounded-2xl focus-visible:ring-2 focus-visible:ring-[#1a4d3e]/20 transition-all"
+                  />
+                  <button className="absolute right-4 top-1/2 -translate-y-1/2 text-[#1a4d3e] hover:scale-110 transition-transform">
+                    <MessageSquare className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
               <Button
-                className="w-full"
                 onClick={() =>
                   handleAddToCart(
                     productDetails?._id,
                     productDetails?.totalStock
                   )
                 }
+                disabled={productDetails?.totalStock === 0}
+                className="w-full h-14 bg-[#1a4d3e] hover:bg-[#143d31] text-white rounded-2xl font-bold text-lg shadow-lg shadow-green-900/10 transition-all active:scale-95 flex items-center justify-center gap-3"
               >
-                Add to Cart
+                <ShoppingCart className="w-5 h-5" />
+                {productDetails?.totalStock === 0
+                  ? "Out of Stock"
+                  : "Add to Cart"}
               </Button>
             </div>
-            <Separator />
-            <div className="max-h-[300px] overflow-auto">
-              <h2 className="text-xl font-bold mb-4 mt-2">Reviews</h2>
-              <div className="grid gap-6">
-                <div className="flex gap-4">
-                  <Avatar className="w-10 h-10 border">
-                    <AvatarFallback>AM</AvatarFallback>
-                  </Avatar>
-                  <div className="grid gap-1">
-                    <div className="flex item-center gap-2">
-                      <h3 className="font-semibold">Aviral Mehrotra</h3>
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                    </div>
-                    <p className="text-muted-foreground">Nice Product</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <Avatar className="w-10 h-10 border">
-                    <AvatarFallback>AM</AvatarFallback>
-                  </Avatar>
-                  <div className="grid gap-1">
-                    <div className="flex item-center gap-2">
-                      <h3 className="font-semibold">Aviral Mehrotra</h3>
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                    </div>
-                    <p className="text-muted-foreground">Nice Product</p>
-                  </div>
-                </div>
-                {/* <div className="flex gap-4">
-                  <Avatar className="w-10 h-10 border">
-                    <AvatarFallback>AM</AvatarFallback>
-                  </Avatar>
-                  <div className="grid gap-1">
-                    <div className="flex item-center gap-2">
-                      <h3 className="font-semibold">Aviral Mehrotra</h3>
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                      <StarIcon className="w-4 h-4 fill-primary" />
-                    </div>
-                    <p className="text-muted-foreground">Nice Product</p>
-                  </div>
-                </div> */}
-              </div>
-              <div className="mt-6 flex gap-2">
-                <Input placeholder="Write a review..." />
-                <Button>Submit</Button>
-              </div>
-            </div>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+        </div>
+
+        {/* Close Button */}
+        <button
+          onClick={handleDialogClose}
+          className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center text-slate-900 hover:bg-white hover:scale-110 transition-all shadow-xl z-50"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </DialogContent>
+    </Dialog>
   );
 }
 

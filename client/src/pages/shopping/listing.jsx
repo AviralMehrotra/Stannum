@@ -16,10 +16,11 @@ import {
   fetchAllFilteredProducts,
   fetchProductDetails,
 } from "@/store/shop/products-slice";
-import { ArrowUpDownIcon } from "lucide-react";
+import { ArrowUpDownIcon, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -29,7 +30,6 @@ function createSearchParamsHelper(filterParams) {
       queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
     }
   }
-  console.log(queryParams, "queryParams");
   return queryParams.join("&");
 }
 
@@ -50,14 +50,9 @@ function ShoppingListing() {
 
   function handleSort(value) {
     setSort(value);
-    // console.log("Sort value changed to:", value);
-
-    // Immediately dispatch the action with new sort value
-
     dispatch(
       fetchAllFilteredProducts({
         filterParams: filters,
-
         sortParams: value,
       })
     );
@@ -150,57 +145,114 @@ function ShoppingListing() {
   }, [productDetails]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
-      <ProductFilter filters={filters} handleFilter={handleFilter} />
-      <div className="bg-background w-full rounded-lg shadow-sm">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h2 className="text-lg font-bold">All Products</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-muted-foreground">
-              {productList?.length} Products
-            </span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1"
-                >
-                  <ArrowUpDownIcon className="h-4 w-4" />
-                  <span>Sort by</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
-                  {sortOptions.map((sortItems) => (
-                    <DropdownMenuRadioItem
-                      value={sortItems.id}
-                      key={sortItems.id}
-                      className={`${
-                        sort === sortItems.id ? "bg-gray-300" : ""
-                      } hover:bg-gray-100`}
+    <div className="min-h-screen bg-slate-50/50">
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Desktop Filter */}
+          <aside className="hidden md:block w-64 flex-shrink-0">
+            <div className="sticky top-24">
+              <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <SlidersHorizontal className="w-5 h-5" />
+                Filters
+              </h2>
+              <ProductFilter filters={filters} handleFilter={handleFilter} />
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <div className="flex-1">
+            <div className="bg-white rounded-[2rem] p-6 mb-8 border border-slate-100 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-900">
+                    All Products
+                  </h1>
+                  <p className="text-slate-500 text-sm mt-1">
+                    Showing {productList?.length} results
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {/* Mobile Filter Trigger */}
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="md:hidden rounded-xl gap-2"
+                      >
+                        <SlidersHorizontal className="w-4 h-4" />
+                        Filters
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="w-full max-w-xs p-6">
+                      <h2 className="text-xl font-bold text-slate-900 mb-6">
+                        Filters
+                      </h2>
+                      <ProductFilter
+                        filters={filters}
+                        handleFilter={handleFilter}
+                      />
+                    </SheetContent>
+                  </Sheet>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="rounded-xl gap-2 min-w-[140px] justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <ArrowUpDownIcon className="h-4 w-4" />
+                          <span>Sort by</span>
+                        </div>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-[200px] rounded-2xl p-2"
                     >
-                      {sortItems.label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                      <DropdownMenuRadioGroup
+                        value={sort}
+                        onValueChange={handleSort}
+                      >
+                        {sortOptions.map((sortItems) => (
+                          <DropdownMenuRadioItem
+                            value={sortItems.id}
+                            key={sortItems.id}
+                            className="rounded-xl cursor-pointer"
+                          >
+                            {sortItems.label}
+                          </DropdownMenuRadioItem>
+                        ))}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {productList && productList.length > 0 ? (
+                productList.map((productItems) => (
+                  <ShoppingProductTile
+                    handleGetProductDetails={handleGetProductDetails}
+                    product={productItems}
+                    handleAddToCart={handleAddToCart}
+                    key={productItems._id}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full py-20 text-center">
+                  <p className="text-slate-400 font-medium">
+                    No products found matching your criteria.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-          {productList && productList.length > 0
-            ? productList.map((productItems) => (
-                <ShoppingProductTile
-                  handleGetProductDetails={handleGetProductDetails}
-                  product={productItems}
-                  handleAddToCart={handleAddToCart}
-                  key={productItems._id}
-                />
-              ))
-            : null}
-        </div>
       </div>
+
       <ProductDetailsDialog
         open={openDetailsDialog}
         setOpen={setOpenDetailsDialog}

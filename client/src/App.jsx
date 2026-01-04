@@ -78,7 +78,7 @@ function App() {
           <Route path="listing" element={<ShoppingListing />} />
           <Route path="search" element={<SearchProducts />} />
         </Route>
-        <Route path="/" element={<Navigate to="/auth/login" />} />
+        <Route path="/" element={<Navigate to="/shop/home" />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
