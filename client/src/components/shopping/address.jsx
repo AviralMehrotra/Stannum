@@ -10,7 +10,8 @@ import {
   fetchAllAddresses,
 } from "@/store/shop/address-slice";
 import AddressCard from "./address-card";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { Plus, MapPin } from "lucide-react";
 
 const initialAddressFormData = {
   address: "",
@@ -20,12 +21,13 @@ const initialAddressFormData = {
   notes: "",
 };
 
-function Address() {
+function Address({ setCurrentSelectedAddress, selectedId }) {
   const [formData, setFormData] = useState(initialAddressFormData);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { addressList } = useSelector((state) => state.shopAddress);
+  const { toast } = useToast();
 
   function handleManageAddress(event) {
     event.preventDefault();
@@ -106,35 +108,46 @@ function Address() {
 
   useEffect(() => {
     dispatch(fetchAllAddresses(user?.id));
-  }, [dispatch]);
+  }, [dispatch, user?.id]);
 
   return (
-    <div>
-      <Card>
-        <div className="mb-5 p-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {addressList && addressList.length > 0
-            ? addressList.map((singleAddressItem) => (
-                <AddressCard
-                  //   selectedId={selectedId}
-                  handleDeleteAddress={handleDeleteAddress}
-                  addressInfo={singleAddressItem}
-                  handleEditAddress={handleEditAddress}
-                  //   setCurrentSelectedAddress={setCurrentSelectedAddress}
-                />
-              ))
-            : null}
-        </div>
-        <CardHeader>
-          <CardTitle>
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {addressList && addressList.length > 0
+          ? addressList.map((singleAddressItem) => (
+              <AddressCard
+                key={singleAddressItem._id}
+                selectedId={selectedId}
+                handleDeleteAddress={handleDeleteAddress}
+                addressInfo={singleAddressItem}
+                handleEditAddress={handleEditAddress}
+                setCurrentSelectedAddress={setCurrentSelectedAddress}
+              />
+            ))
+          : null}
+      </div>
+
+      <Card className="border-none shadow-none bg-slate-50/50 rounded-[2rem] overflow-hidden">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <div className="p-2 rounded-xl bg-white text-[#1a4d3e] shadow-sm">
+              {currentEditedId !== null ? (
+                <MapPin className="w-4 h-4" />
+              ) : (
+                <Plus className="w-4 h-4" />
+              )}
+            </div>
             {currentEditedId !== null ? "Edit Address" : "Add New Address"}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent>
           <CommonForm
             formControls={addressFormControls}
             formData={formData}
             setFormData={setFormData}
-            buttonText={currentEditedId !== null ? "Edit" : "Add"}
+            buttonText={
+              currentEditedId !== null ? "Update Address" : "Save Address"
+            }
             onSubmit={handleManageAddress}
             isBtnDisabled={!isFormValid()}
           />

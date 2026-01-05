@@ -1,87 +1,242 @@
 import { useState } from "react";
 import CommonForm from "../common/form";
-import { DialogContent } from "../ui/dialog";
+import { DialogContent, DialogTitle } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
+import { Badge } from "../ui/badge";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllOrdersForAdmin,
+  getOrderDetailsForAdmin,
+  updateOrderStatus,
+} from "@/store/admin/order-slice";
+import { useToast } from "@/hooks/use-toast";
+import { ShoppingBag, MapPin, CreditCard, Calendar, User } from "lucide-react";
 
 const initialFormData = {
   status: "",
 };
 
-function AdminOrderDetailsView() {
+function AdminOrderDetailsView({ orderDetails }) {
   const [formData, setFormData] = useState(initialFormData);
+  const dispatch = useDispatch();
+  const { toast } = useToast();
 
   function handleUpdateStatus(event) {
     event.preventDefault();
+    const { status } = formData;
+
+    dispatch(
+      updateOrderStatus({ id: orderDetails?._id, orderStatus: status })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(getOrderDetailsForAdmin(orderDetails?._id));
+        dispatch(getAllOrdersForAdmin());
+        setFormData(initialFormData);
+        toast({
+          title: data?.payload?.message,
+        });
+      }
+    });
   }
 
   return (
-    <DialogContent className="sm:max-w-[600px">
-      <div className="grid gap-6">
-        <div className="grid gap-2">
-          <div className="flex items-center justify-between mt-6">
-            <p className="font-medium">Order Id</p>
-            <Label>123456</Label>
-          </div>
-          <div className="flex items-center justify-between mt-2">
-            <p className="font-medium">Order Date</p>
-            <Label>01/01/2025</Label>
-          </div>
-          <div className="flex items-center justify-between mt-2">
-            <p className="font-medium">Order Status</p>
-            <Label>In Process</Label>
-          </div>
-          <div className="flex items-center justify-between mt-2">
-            <p className="font-medium">Order Price</p>
-            <Label>2000 Rs</Label>
-          </div>
-        </div>
-        <Separator />
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <div className="font-medium">Order Details</div>
-            <ul className="grid gap-3">
-              <li className="flex item-center justify-between">
-                <span>Product 1</span>
-                <span>1000 Rs</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <div className="font-medium">Shipping Information</div>
-            <div className="grid gap-0 5 text-muted-foreground">
-              <span>P. Diddy</span>
-              <span>Address</span>
-              <span>City</span>
-              <span>Pincode</span>
-              <span>Phone</span>
-              <span>Notes</span>
+    <DialogContent className="p-0 border-none max-w-[95vw] sm:max-w-[80vw] lg:max-w-[700px] bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
+      <div className="flex flex-col h-full max-h-[90vh]">
+        {/* Header */}
+        <div className="bg-[#1a4d3e] p-8 lg:p-10 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl" />
+          <div className="relative z-10 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-xl border border-white/20">
+                <ShoppingBag className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <DialogTitle className="text-2xl font-bold tracking-tight">
+                  Manage Order
+                </DialogTitle>
+                <p className="text-green-100/60 text-xs font-bold uppercase tracking-widest mt-1">
+                  ID: {orderDetails?._id}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-        <div>
-          <CommonForm
-            formControls={[
-              {
-                label: "Order Status",
-                name: "status",
-                componentType: "select",
-                options: [
-                  { id: "pending", label: "Pending" },
-                  { id: "inProcess", label: "In Process" },
-                  { id: "inShipping", label: "In Shipping" },
-                  { id: "delivered", label: "Delivered" },
-                  { id: "rejected", label: "Rejected" },
-                ],
-              },
-            ]}
-            formData={formData}
-            setFormData={setFormData}
-            buttonText={"Update order status"}
-            onSubmit={handleUpdateStatus}
-          />
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-8 lg:p-10 space-y-10">
+          {/* Status & Date */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-slate-400">
+                <Calendar className="w-4 h-4" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">
+                  Order Date
+                </span>
+              </div>
+              <p className="text-sm font-bold text-slate-900">
+                {new Date(orderDetails?.orderDate).toLocaleDateString("en-IN", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-slate-400">
+                <div className="w-4 h-4 rounded-full border-2 border-slate-200" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">
+                  Current Status
+                </span>
+              </div>
+              <Badge
+                className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border-none ${
+                  orderDetails?.orderStatus === "confirmed"
+                    ? "bg-green-100 text-green-700"
+                    : orderDetails?.orderStatus === "rejected"
+                    ? "bg-red-100 text-red-700"
+                    : "bg-amber-100 text-amber-700"
+                }`}
+              >
+                {orderDetails?.orderStatus}
+              </Badge>
+            </div>
+          </div>
+
+          <Separator className="bg-slate-100" />
+
+          {/* Items */}
+          <div className="space-y-6">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              Order Breakdown
+            </h3>
+            <div className="space-y-4">
+              {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
+                ? orderDetails?.cartItems.map((item) => (
+                    <div
+                      key={item.productId}
+                      className="flex items-center gap-4 group"
+                    >
+                      <div className="w-16 h-16 rounded-2xl bg-slate-50 p-2 flex-shrink-0 border border-slate-100 group-hover:border-green-200 transition-colors">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-900 truncate">
+                          {item.title}
+                        </p>
+                        <p className="text-xs text-slate-500 font-medium">
+                          Qty: {item.quantity}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold text-slate-900">
+                          ₹{item.price.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                : null}
+            </div>
+            <div className="pt-4 border-t border-slate-50 flex justify-between items-center">
+              <span className="text-sm font-bold text-slate-900">
+                Total Revenue
+              </span>
+              <span className="text-xl font-bold text-[#1a4d3e]">
+                ₹{orderDetails?.totalAmount.toLocaleString()}
+              </span>
+            </div>
+          </div>
+
+          <Separator className="bg-slate-100" />
+
+          {/* Customer & Shipping */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-slate-400">
+                <User className="w-4 h-4" />
+                <h3 className="text-[10px] font-bold uppercase tracking-widest">
+                  Customer Info
+                </h3>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-slate-900">
+                  {orderDetails?.addressInfo?.userName || "Customer"}
+                </p>
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <MapPin className="w-3 h-3" />
+                  {orderDetails?.addressInfo?.city},{" "}
+                  {orderDetails?.addressInfo?.pincode}
+                </div>
+                <p className="text-xs text-slate-500 font-medium mt-2">
+                  Phone: {orderDetails?.addressInfo?.phone}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-slate-400">
+                <CreditCard className="w-4 h-4" />
+                <h3 className="text-[10px] font-bold uppercase tracking-widest">
+                  Payment Details
+                </h3>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-slate-900 capitalize">
+                  {orderDetails?.paymentMethod}
+                </p>
+                <p className="text-xs text-slate-500 font-medium">
+                  Status:
+                  <span className="ml-1 text-green-600 font-bold uppercase text-[9px] tracking-widest">
+                    {orderDetails?.paymentStatus}
+                  </span>
+                </p>
+                {orderDetails?.paymentId && (
+                  <p className="text-[10px] text-slate-400 font-mono mt-2 truncate">
+                    Ref: {orderDetails?.paymentId}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <Separator className="bg-slate-100" />
+
+          {/* Update Status Form */}
+          <div className="bg-slate-50 rounded-3xl p-8 space-y-6">
+            <h3 className="text-sm font-bold text-slate-900">
+              Update Order Status
+            </h3>
+            <CommonForm
+              formControls={[
+                {
+                  label: "Select New Status",
+                  name: "status",
+                  componentType: "select",
+                  options: [
+                    { id: "pending", label: "Pending" },
+                    { id: "inProcess", label: "In Process" },
+                    { id: "inShipping", label: "In Shipping" },
+                    { id: "delivered", label: "Delivered" },
+                    { id: "rejected", label: "Rejected" },
+                  ],
+                },
+              ]}
+              formData={formData}
+              setFormData={setFormData}
+              buttonText={"Update Status"}
+              onSubmit={handleUpdateStatus}
+            />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex items-center justify-center">
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+            Stannum. Admin Control Panel
+          </p>
         </div>
       </div>
     </DialogContent>

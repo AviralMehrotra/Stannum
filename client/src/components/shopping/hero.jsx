@@ -10,7 +10,7 @@ function Hero() {
       <div className="container mx-auto px-4 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-6 animate-fade-in">
           <Star className="w-4 h-4 fill-current" />
-          <span>700+ students with us</span>
+          <span>700+ tech enthusiasts with us</span>
         </div>
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 tracking-tight mb-6 max-w-4xl mx-auto leading-[1.1]">

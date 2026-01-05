@@ -76,7 +76,7 @@ function HeaderRightContent() {
         <Button
           onClick={() => navigate("/auth/login")}
           variant="ghost"
-          className="text-sm font-bold text-slate-600 hover:text-[#1a4d3e]"
+          className="text-sm font-bold text-slate-600 hover:text-[#1a4d3e] hover:bg-green-50"
         >
           Log in
         </Button>
@@ -139,15 +139,15 @@ function HeaderRightContent() {
           <DropdownMenuSeparator className="my-1" />
           <DropdownMenuItem
             onClick={() => navigate("/shop/account")}
-            className="rounded-xl cursor-pointer focus:bg-slate-50"
+            className="rounded-xl cursor-pointer focus:bg-slate-500"
           >
-            <UserCog className="mr-2 h-4 w-4 text-slate-400" />
+            <UserCog className="mr-2 h-4 w-4 " />
             <span className="font-medium">Account Settings</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="my-1" />
           <DropdownMenuItem
             onClick={handleLogout}
-            className="rounded-xl cursor-pointer focus:bg-red-50 text-red-600"
+            className="rounded-xl cursor-pointer focus:bg-red-400 text-red-600"
           >
             <LogOut className="mr-2 h-4 w-4" />
             <span className="font-medium">Log out</span>
