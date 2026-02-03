@@ -18,12 +18,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth } from "./store/auth-slice";
 import { Skeleton } from "./components/ui/skeleton";
+import LoadingScreen from "./components/common/LoadingScreen";
 import SearchProducts from "./pages/shopping/search";
 import PaymentSuccessPage from "./pages/shopping/payment-success";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
-    (state) => state.auth
+    (state) => state.auth,
   );
   const dispatch = useDispatch();
 
@@ -33,11 +34,7 @@ function App() {
   }, [dispatch]);
 
   if (isLoading) {
-    return (
-      <div className="">
-        <Skeleton className="w-[600px] h-[600px] rounded-full" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
