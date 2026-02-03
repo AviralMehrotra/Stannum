@@ -13,6 +13,7 @@ import ShoppingCheckout from "./pages/shopping/checkout";
 import ShoppingHome from "./pages/shopping/home";
 import ShoppingListing from "./pages/shopping/listing";
 import CheckAuth from "./components/common/checkAuth";
+import ScrollToTop from "./components/common/ScrollToTop";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { checkAuth } from "./store/auth-slice";
@@ -41,6 +42,7 @@ function App() {
 
   return (
     <div className="flex flex-col overflow-hidden bg-white">
+      <ScrollToTop />
       <Routes>
         <Route
           path="/auth"
