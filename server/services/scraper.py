@@ -66,15 +66,13 @@ Avoid quoting or repeating individual user opinions. Maintain a professional and
 User Reviews:
 {reviews_text[:10000]}"""
         
-        response = co.summarize(
-            text=prompt,
-            length='long',
-            format='paragraph',
-            model='command',
+        response = co.chat(
+            message=prompt,
+            model='command-a-vision-07-2025',
             temperature=0.3
         )
         
-        return response.summary
+        return response.text
     except Exception as e:
         return f"Summarization failed: {str(e)}"
 
