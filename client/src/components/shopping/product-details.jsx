@@ -1,4 +1,6 @@
 import { StarIcon, ShoppingCart, X, MessageSquare, User } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
@@ -21,7 +23,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
 
     if (getCartItems.length) {
       const indexOfCurrentItem = getCartItems.findIndex(
-        (item) => item.productId === getCurrentProductId
+        (item) => item.productId === getCurrentProductId,
       );
       if (indexOfCurrentItem > -1) {
         const getQuantity = getCartItems[indexOfCurrentItem].quantity;
@@ -40,7 +42,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         userId: user?.id,
         productId: getCurrentProductId,
         quantity: 1,
-      })
+      }),
     ).then((data) => {
       if (data?.payload?.success) {
         dispatch(fetchCartItems(user?.id));
@@ -138,9 +140,22 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                   Description
                 </h3>
-                <p className="text-slate-600 leading-relaxed">
-                  {productDetails?.description}
-                </p>
+                <div
+                  className="text-slate-600 leading-relaxed prose prose-sm max-w-none
+                  [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-slate-800 [&_h2]:mt-4 [&_h2]:mb-1
+                  [&_h3]:text-sm [&_h3]:font-bold [&_h3]:text-slate-700 [&_h3]:mt-3 [&_h3]:mb-1
+                  [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1
+                  [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1
+                  [&_li]:text-sm [&_li]:text-slate-600
+                  [&_strong]:font-bold [&_strong]:text-slate-800
+                  [&_p]:text-sm [&_p]:text-slate-600 [&_p]:mb-2
+                  [&_hr]:border-slate-100 [&_hr]:my-3
+                  [&_a]:text-[#1a4d3e] [&_a]:underline"
+                >
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {productDetails?.description || ""}
+                  </ReactMarkdown>
+                </div>
               </div>
 
               {/* Reviews Section */}
@@ -207,7 +222,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 onClick={() =>
                   handleAddToCart(
                     productDetails?._id,
-                    productDetails?.totalStock
+                    productDetails?.totalStock,
                   )
                 }
                 disabled={productDetails?.totalStock === 0}

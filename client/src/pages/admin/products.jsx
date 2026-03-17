@@ -18,8 +18,9 @@ import {
 } from "@/store/admin/products-slice";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Textarea } from "@/components/ui/textarea";
 import { Plus, Package, Sparkles } from "lucide-react";
+import MDEditor from "@uiw/react-md-editor";
+import "@uiw/react-md-editor/markdown-editor.css";
 
 const initialFormData = {
   image: null,
@@ -52,7 +53,7 @@ function AdminProducts() {
           editProduct({
             id: currentEditedId,
             formData,
-          })
+          }),
         ).then((data) => {
           if (data?.payload?.success) {
             dispatch(fetchAllProducts());
@@ -68,7 +69,7 @@ function AdminProducts() {
           addNewProduct({
             ...formData,
             image: uploadedImageUrl,
-          })
+          }),
         ).then((data) => {
           if (data?.payload?.success) {
             dispatch(fetchAllProducts());
@@ -121,7 +122,7 @@ function AdminProducts() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ productName: formData.title }),
-        }
+        },
       );
 
       const result = await response.json();
@@ -283,20 +284,28 @@ function AdminProducts() {
                           {isGenerating ? "Generating..." : "AI Generate"}
                         </button>
                       </div>
-                      <Textarea
-                        name={control.name}
-                        placeholder={control.placeholder}
-                        id={control.id}
-                        value={formData.description}
-                        onChange={(event) =>
-                          setFormData({
-                            ...formData,
-                            description: event.target.value,
-                          })
-                        }
-                        rows={5}
-                        className="bg-slate-50 border-none rounded-2xl focus-visible:ring-2 focus-visible:ring-[#1a4d3e]/20 transition-all resize-none"
-                      />
+                      <div
+                        data-color-mode="light"
+                        className="overflow-hidden rounded-2xl border border-slate-100 shadow-sm"
+                      >
+                        <MDEditor
+                          id={control.id}
+                          value={formData.description}
+                          onChange={(value) =>
+                            setFormData({
+                              ...formData,
+                              description: value || "",
+                            })
+                          }
+                          height={280}
+                          preview="live"
+                          style={{
+                            borderRadius: "1rem",
+                            border: "none",
+                            fontFamily: "inherit",
+                          }}
+                        />
+                      </div>
                     </div>
                   ),
                 }}

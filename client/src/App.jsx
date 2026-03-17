@@ -23,7 +23,7 @@ import SearchProducts from "./pages/shopping/search";
 import PaymentSuccessPage from "./pages/shopping/payment-success";
 
 function App() {
-  const { user, isAuthenticated, isLoading } = useSelector(
+  const { user, isAuthenticated, isLoading, isCheckingAuth } = useSelector(
     (state) => state.auth,
   );
   const dispatch = useDispatch();
@@ -33,7 +33,7 @@ function App() {
     dispatch(checkAuth(token));
   }, [dispatch]);
 
-  if (isLoading) {
+  if (isCheckingAuth) {
     return <LoadingScreen />;
   }
 

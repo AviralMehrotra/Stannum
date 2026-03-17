@@ -4,7 +4,8 @@ import axios from "axios";
 
 const initialState = {
   isAuthenticated: false,
-  isLoading: true,
+  isLoading: false,
+  isCheckingAuth: true,
   user: null,
   token: null,
 };
@@ -17,10 +18,10 @@ export const registerUser = createAsyncThunk(
       formData,
       {
         withCredentials: true,
-      }
+      },
     );
     return response.data;
-  }
+  },
 );
 
 export const loginUser = createAsyncThunk("/auth/login", async (formData) => {
@@ -29,7 +30,7 @@ export const loginUser = createAsyncThunk("/auth/login", async (formData) => {
     formData,
     {
       withCredentials: true,
-    }
+    },
   );
   return response.data;
 });
@@ -40,7 +41,7 @@ export const logOutUser = createAsyncThunk("/auth/logout", async () => {
     {},
     {
       withCredentials: true,
-    }
+    },
   );
   return response.data;
 });
@@ -57,10 +58,10 @@ export const checkAuth = createAsyncThunk(
           "Cache-Control":
             "no-store, no-cache, must-revalidate, proxy-revalidate",
         },
-      }
+      },
     );
     return response.data;
-  }
+  },
 );
 
 const authSlice = createSlice({
@@ -106,15 +107,15 @@ const authSlice = createSlice({
         state.token = null;
       })
       .addCase(checkAuth.pending, (state) => {
-        state.isLoading = true;
+        state.isCheckingAuth = true;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isCheckingAuth = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
       })
       .addCase(checkAuth.rejected, (state, action) => {
-        state.isLoading = false;
+        state.isCheckingAuth = false;
         state.user = null;
         state.isAuthenticated = false;
       })

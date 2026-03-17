@@ -38,7 +38,7 @@ app.use(
       "x-requested-with",
     ],
     credentials: true,
-  })
+  }),
 );
 
 app.use(cookieParser());

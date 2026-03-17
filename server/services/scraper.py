@@ -41,40 +41,67 @@ def fetch_reddit_reviews(reddit, product_name, limit=50):
                 reviews_text += submission.selftext + "\n\n"
         return reviews_text
     except Exception as e:
-        return "" # Return empty string if reddit search fails
+        return ""  # Return empty string if reddit search fails
 
-def summarize_reviews(co, product_name, reviews_text):
-    """Summarize the collected reviews"""
-    if not reviews_text.strip():
-        return "No reviews found to summarize."
+def generate_product_description(co, product_name, reviews_text=""):
+    """Generate a structured Markdown product description using AI knowledge + optional Reddit reviews"""
     
-    try:
-        prompt = f"""
-You are a professional product reviewer. Based on the following user reviews for the product **{product_name}**, write a detailed and structured summary. Do not mention unrelated products or casual experiences.
-
-Your summary should include:
-
-1. **Overview** – What the product is and what it's used for.
-2. **Pros** – Highlight the strengths or what users liked.
-3. **Cons** – Point out common criticisms or drawbacks.
-4. **Who Should Buy This** – Suggest who would benefit most from this product.
-5. **Final Thoughts** – A balanced conclusion based on the overall sentiment.
-
-Only focus on the product mentioned: **{product_name}**.
-Avoid quoting or repeating individual user opinions. Maintain a professional and neutral tone.
+    reddit_section = ""
+    if reviews_text.strip():
+        reddit_section = f"""
+Additionally, supplement your knowledge with insights from the following real user reviews.
+Use these to validate or enrich the Pros, Cons, and target audience sections — but do NOT rely on them exclusively.
 
 User Reviews:
-{reviews_text[:10000]}"""
-        
+{reviews_text[:8000]}
+"""
+
+    prompt = f"""You are an expert product analyst and technical writer for an e-commerce platform.
+
+Write a comprehensive, well-structured product description for: **{product_name}**
+
+Use your own extensive product knowledge as the PRIMARY source. {f"Real user feedback has been provided below to supplement your analysis." if reviews_text.strip() else "No user reviews are available, so rely entirely on your own knowledge."}
+
+Output the description in **valid Markdown** format with the following sections in this exact order:
+
+## Product Overview
+A 2-3 sentence introduction explaining what the product is, who makes it, and what problem it solves.
+
+## Key Specifications
+A bullet list of the most important technical specifications (e.g. dimensions, weight, battery life, material, compatibility, capacity — whatever is relevant to this product type).
+
+## Pros
+A bullet list of genuine strengths and advantages of this product.
+
+## Cons
+A bullet list of honest drawbacks or limitations.
+
+## Who Should Buy This
+2-3 sentences describing the ideal buyer — their use case, lifestyle, or needs that make this product a great fit for them.
+
+## Final Verdict
+A 2-3 sentence balanced conclusion with an overall recommendation.
+
+---
+
+Rules:
+- Output ONLY the Markdown content. No preamble, no explanations outside the sections.
+- Use `##` for section headings.
+- Use `-` for bullet points.
+- Be specific and accurate. Avoid vague marketing language.
+- Maintain a professional, neutral, and helpful tone.
+- Focus exclusively on **{product_name}**.
+{reddit_section}"""
+
+    try:
         response = co.chat(
             message=prompt,
             model='command-a-vision-07-2025',
             temperature=0.3
         )
-        
         return response.text
     except Exception as e:
-        return f"Summarization failed: {str(e)}"
+        return f"Description generation failed: {str(e)}"
 
 def main():
     if len(sys.argv) < 2:
@@ -84,10 +111,13 @@ def main():
     product_name = sys.argv[1]
     co, reddit = initialize_clients()
     
+    # Try to fetch Reddit reviews but don't block on failure
     all_reviews_text = fetch_reddit_reviews(reddit, product_name)
-    summary = summarize_reviews(co, product_name, all_reviews_text)
+    
+    # Generate the description using AI + optional Reddit data
+    summary = generate_product_description(co, product_name, all_reviews_text)
     
     print(json.dumps({"summary": summary}))
 
 if __name__ == "__main__":
-    main() 
+    main()
