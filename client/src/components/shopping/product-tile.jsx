@@ -1,13 +1,30 @@
 import { brandOptionsMap, categoryOptionsMap } from "@/config";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { ShoppingCart, Eye } from "lucide-react";
+import { ShoppingCart, Eye, GitCompareArrows } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCompare, removeFromCompare } from "@/store/shop/compare-slice";
 
 function ShoppingProductTile({
   product,
   handleGetProductDetails,
   handleAddToCart,
 }) {
+  const dispatch = useDispatch();
+  const { compareItems } = useSelector((state) => state.shopCompare);
+
+  const isInCompare = compareItems.some((p) => p._id === product?._id);
+  const isMaxReached = compareItems.length >= 3 && !isInCompare;
+
+  function handleCompareToggle(e) {
+    e.stopPropagation();
+    if (isInCompare) {
+      dispatch(removeFromCompare(product._id));
+    } else if (!isMaxReached) {
+      dispatch(addToCompare(product));
+    }
+  }
+
   return (
     <div className="group relative bg-white rounded-[2rem] border border-slate-100 p-3 transition-all duration-500 hover:shadow-2xl hover:shadow-green-900/5 hover:-translate-y-2">
       {/* Image Container */}
@@ -23,6 +40,7 @@ function ShoppingProductTile({
 
         {/* Overlay Actions */}
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+          {/* View Details */}
           <button
             className="w-12 h-12 rounded-full bg-white text-[#1a4d3e] flex items-center justify-center shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 hover:bg-[#1a4d3e] hover:text-white"
             onClick={(e) => {
@@ -31,6 +49,28 @@ function ShoppingProductTile({
             }}
           >
             <Eye className="w-5 h-5" />
+          </button>
+
+          {/* Compare Toggle */}
+          <button
+            onClick={handleCompareToggle}
+            disabled={isMaxReached}
+            title={
+              isMaxReached
+                ? "Max 3 products can be compared"
+                : isInCompare
+                  ? "Remove from compare"
+                  : "Add to compare"
+            }
+            className={`w-12 h-12 rounded-full flex items-center justify-center shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 disabled:opacity-40 disabled:cursor-not-allowed
+              ${
+                isInCompare
+                  ? "bg-[#1a4d3e] text-white"
+                  : "bg-white text-[#1a4d3e] hover:bg-[#1a4d3e] hover:text-white"
+              }`}
+            style={{ transitionDelay: "50ms" }}
+          >
+            <GitCompareArrows className="w-5 h-5" />
           </button>
         </div>
 
@@ -52,6 +92,13 @@ function ShoppingProductTile({
             </Badge>
           )}
         </div>
+
+        {/* Compare indicator dot */}
+        {isInCompare && (
+          <div className="absolute bottom-4 right-4 w-6 h-6 rounded-full bg-[#1a4d3e] flex items-center justify-center shadow-lg">
+            <GitCompareArrows className="w-3.5 h-3.5 text-white" />
+          </div>
+        )}
       </div>
 
       {/* Content */}

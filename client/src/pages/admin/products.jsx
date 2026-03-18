@@ -158,6 +158,31 @@ function AdminProducts() {
     dispatch(fetchAllProducts());
   }, [dispatch]);
 
+  // Seed uploadedImageUrl from the existing product image when entering edit mode
+  useEffect(() => {
+    if (currentEditedId !== null && formData.image) {
+      setUploadedImageUrl(formData.image);
+    }
+    if (currentEditedId === null) {
+      setUploadedImageUrl("");
+    }
+  }, [currentEditedId]);
+
+  // Keep formData.image in sync whenever the uploaded URL changes (new upload or removal)
+  useEffect(() => {
+    if (uploadedImageUrl !== undefined) {
+      setFormData((prev) => ({ ...prev, image: uploadedImageUrl }));
+    }
+  }, [uploadedImageUrl]);
+
+  // Fix: restore body scroll if Sheet closes without cleaning up (radix-ui quirk)
+  useEffect(() => {
+    if (!openCreateProductsDialog) {
+      document.body.style.overflow = "";
+      document.body.style.pointerEvents = "";
+    }
+  }, [openCreateProductsDialog]);
+
   return (
     <Fragment>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">

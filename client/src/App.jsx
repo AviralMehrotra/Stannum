@@ -21,6 +21,7 @@ import { Skeleton } from "./components/ui/skeleton";
 import LoadingScreen from "./components/common/LoadingScreen";
 import SearchProducts from "./pages/shopping/search";
 import PaymentSuccessPage from "./pages/shopping/payment-success";
+import CompareProducts from "./pages/shopping/compare";
 
 function App() {
   const { user, isAuthenticated, isLoading, isCheckingAuth } = useSelector(
@@ -78,6 +79,7 @@ function App() {
           <Route path="listing" element={<ShoppingListing />} />
           <Route path="search" element={<SearchProducts />} />
           <Route path="payment-success" element={<PaymentSuccessPage />} />
+          <Route path="compare" element={<CompareProducts />} />
         </Route>
         <Route path="/" element={<Navigate to="/shop/home" />} />
         <Route path="*" element={<NotFound />} />
